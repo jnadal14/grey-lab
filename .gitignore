@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# full-resolution media masters (rebuild with scripts/fetch-media.mjs)
+/_source/

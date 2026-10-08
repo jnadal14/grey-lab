@@ -1,0 +1,12 @@
+# Cloudflare Pages response headers.
+
+/*
+  X-Robots-Tag: noindex
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Content-hashed build assets and media never change at the same URL.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+/media/*
+  Cache-Control: public, max-age=2592000

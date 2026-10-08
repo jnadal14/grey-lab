@@ -1,26 +1,156 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Black, warm greys and white, like the Homecoming Fest 26' poster. Fonts
+   follow greylab.ca exactly: Vina Sans for headings (uppercase), Bayon for
+   body copy and navigation, Familjen Grotesk for small labels, buttons and
+   forms.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #0a0a09;
+  --color-coal: #121211;
+  --color-smoke: #1b1a18;
+  --color-iron: #2a2926;
+  --color-ash: #8f8a80;
+  --color-fog: #bdb8ad;
+  --color-bone: #ece8de;
+
+  --font-display: var(--font-vina), "Impact", sans-serif;
+  --font-body: var(--font-bayon), var(--font-vina), sans-serif;
+  --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Display sizes scale with width but are capped by height, so a phone
+     turned sideways doesn't get letters taller than the screen. */
+  --text-mega: clamp(3.5rem, min(17vw, 30svh), 18rem);
+  --text-giant: clamp(2.75rem, min(10vw, 20svh), 10rem);
+  --text-huge: clamp(2.25rem, min(6.5vw, 15svh), 6rem);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Short viewports: phones in landscape. */
+@custom-variant short (@media (max-height: 540px));
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    line-height: 1.3;
+    background: var(--color-ink);
+    overflow-x: clip;
+  }
+  button, input, textarea, select {
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    background: var(--color-bone);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-bone);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  /* Anchored sections clear the fixed nav. */
+  [id] {
+    scroll-margin-top: 5rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .display {
+    font-family: var(--font-display);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .container-x {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+  }
+  .hairline {
+    border-color: color-mix(in oklab, var(--color-bone) 12%, transparent);
+  }
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 55%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Film grain over everything, like the poster stock. Pointer-transparent and
+   stepped so it reads as texture, not motion.
+--------------------------------------------------------------------------- */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.9s steps(6) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -4%); }
+  60% { transform: translate(-4%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Gallery grid: 4:3 cells, portraits span two rows. Container query units keep
+   the row height tied to the column width at every breakpoint. */
+.gallery-grid {
+  container-type: inline-size;
+  display: grid;
+  --cols: 2;
+  --gap: 0.5rem;
+  gap: var(--gap);
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-auto-rows: calc((100cqw - (var(--cols) - 1) * var(--gap)) / var(--cols) * 0.75);
+  grid-auto-flow: dense;
+}
+@media (min-width: 768px) { .gallery-grid { --cols: 3; --gap: 0.75rem; } }
+@media (min-width: 1280px) { .gallery-grid { --cols: 4; } }
+
+/* Route change: a quick lift-and-fade driven by React <ViewTransition>. */
+::view-transition-old(root) {
+  animation: 260ms var(--ease-in-out-quart) both page-out;
+}
+::view-transition-new(root) {
+  animation: 520ms var(--ease-out-expo) both page-in;
+}
+@keyframes page-out {
+  to { opacity: 0; transform: translateY(-1.5%); filter: blur(4px); }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(2.5%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+  html { scroll-behavior: auto; }
 }
