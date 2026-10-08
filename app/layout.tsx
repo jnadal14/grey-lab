@@ -13,7 +13,8 @@ const vina = Vina_Sans({ weight: '400', subsets: ['latin'], variable: '--font-vi
 const familjen = Familjen_Grotesk({ subsets: ['latin'], variable: '--font-familjen', display: 'swap' })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
+  // Absolute URLs (share previews) point at wherever this build is hosted.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? site.url),
   title: { default: `${site.name} · ${site.tagline}`, template: `%s · ${site.short}` },
   description:
     'Greylab Productions is a Vancouver live music and media company: showrunning, full event media coverage, backline and technical crew, and artist management.',

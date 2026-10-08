@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Magnetic from './motion/Magnetic'
 import { ArrowIcon } from './icons'
+import { withBase } from '@/lib/base-path'
 
 type Props = {
   href: string
@@ -35,7 +36,7 @@ export default function Button({ href, children, variant = 'solid', external, cl
   return (
     <Magnetic strength={0.25}>
       {external || download ? (
-        <a href={href} {...(external && { target: '_blank', rel: 'noopener noreferrer' })} {...(download && { download: true })}>{inner}</a>
+        <a href={external ? href : withBase(href)} {...(external && { target: '_blank', rel: 'noopener noreferrer' })} {...(download && { download: true })}>{inner}</a>
       ) : (
         <Link href={href}>{inner}</Link>
       )}

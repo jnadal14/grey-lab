@@ -31,6 +31,12 @@ Content edits happen in `content/`: `events.ts` (next show, past shows),
 `services.ts`, `gallery.ts` (photo order and Concert/Shoot category),
 `articles.ts`, `site.ts` (socials, form id, demo date).
 
+## Deploying to GitHub Pages
+`.github/workflows/pages.yml` builds and publishes on every push to `main`
+(enable it once in Settings → Pages → Source → GitHub Actions). The site is
+served from `https://jnadal14.github.io/grey-lab/`; the workflow passes that
+sub-path to the build as `PAGES_BASE_PATH`.
+
 ## Deploying to Cloudflare Pages
 Connect the (private) GitHub repo in Cloudflare → Workers & Pages → Create →
 Pages → Connect to Git, then:
